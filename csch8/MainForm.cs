@@ -19,6 +19,7 @@ namespace csch8
 
         private Color primaryColor;
         private Color secondaryColor;
+        private Emulator emulator;
 
         /// <summary>
         /// Draws a frame on the screen.
@@ -38,7 +39,7 @@ namespace csch8
                 try
                 {
                     //TODO check if an emu already exists, if so kill it
-                    Emulator emu = new Emulator(fileDialog.FileName);
+                    emulator = new Emulator(fileDialog.FileName, dynamicRecompilerToolStripMenuItem.Checked);
                 }
                 catch (Exception ex)
                 {
@@ -62,11 +63,13 @@ namespace csch8
             {
                 if (interpreterToolStripMenuItem.Checked)
                 {
+                    emulator.DynamicRecompiler = true;
                     dynamicRecompilerToolStripMenuItem.Checked = true;
                     interpreterToolStripMenuItem.Checked = false;
                 }
                 else
                 {
+                    emulator.DynamicRecompiler = false;
                     dynamicRecompilerToolStripMenuItem.Checked = false;
                     interpreterToolStripMenuItem.Checked = true;
                 }
@@ -79,11 +82,13 @@ namespace csch8
             {
                 if (dynamicRecompilerToolStripMenuItem.Checked)
                 {
+                    emulator.DynamicRecompiler = true;
                     dynamicRecompilerToolStripMenuItem.Checked = false;
                     interpreterToolStripMenuItem.Checked = true;
                 }
                 else
                 {
+                    emulator.DynamicRecompiler = false;
                     dynamicRecompilerToolStripMenuItem.Checked = true;
                     interpreterToolStripMenuItem.Checked = false;
                 }
