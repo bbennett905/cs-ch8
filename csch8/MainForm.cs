@@ -35,6 +35,15 @@ namespace csch8
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
                 MessageBox.Show(fileDialog.FileName, "PLACEHOLDER");
+                try
+                {
+                    //TODO check if an emu already exists, if so kill it
+                    Emulator emu = new Emulator(fileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
         }
 
