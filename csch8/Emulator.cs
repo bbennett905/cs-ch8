@@ -115,13 +115,13 @@ namespace csch8
                 
                 //Sets VX = NN (0x6XNN)
                 case 0x6000:
-                    registers[(opcode & 0x0F00) >> 16] = (byte)(opcode & 0x00FF);
+                    registers[(opcode & 0x0F00) >> 8] = (byte)(opcode & 0x00FF);
                     programCounter += 2;
                     break;
 
                 //Increments VX by NN (0x7XNN)
                 case 0x7000:
-                    registers[(opcode & 0x0F00) >> 16] += (byte)(opcode & 0x00FF);
+                    registers[(opcode & 0x0F00) >> 8] += (byte)(opcode & 0x00FF);
                     programCounter += 2;
                     break;
 
@@ -131,63 +131,63 @@ namespace csch8
                     {
                         //Sets VX = VY (0x8XY0)
                         case 0x0000:
-                            registers[(opcode & 0x0F00) >> 16] = registers[(opcode & 0x00F0) >> 8];
+                            registers[(opcode & 0x0F00) >> 8] = registers[(opcode & 0x00F0) >> 4];
                             programCounter += 2;
                             break;
 
                         //Sets VX = VX | VY (0x8XY1), set VF to 0
                         case 0x0001:
-                            registers[(opcode & 0x0F00) >> 16] |= registers[(opcode & 0x00F0) >> 8];
+                            registers[(opcode & 0x0F00) >> 8] |= registers[(opcode & 0x00F0) >> 4];
                             registers[0xF] = 0;
                             programCounter += 2;
                             break;
 
                         //Sets VX = VX & VY (0x8XY2), set VF to 0
                         case 0x0002:
-                            registers[(opcode & 0x0F00) >> 16] &= registers[(opcode & 0x00F0) >> 8];
+                            registers[(opcode & 0x0F00) >> 8] &= registers[(opcode & 0x00F0) >> 4];
                             registers[0xF] = 0;
                             programCounter += 2;
                             break;
 
                         //Sets VX = VX ^ VY (0x8XY3), set VF to 0
                         case 0x0003:
-                            registers[(opcode & 0x0F00) >> 16] ^= registers[(opcode & 0x00F0) >> 8];
+                            registers[(opcode & 0x0F00) >> 8] ^= registers[(opcode & 0x00F0) >> 4];
                             registers[0xF] = 0;
                             programCounter += 2;
                             break;
 
                         //Increments VX by VY, sets VF to 1 if carry and 0 if not (0x8XY4)
                         case 0x0004:
-                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 16] + registers[(opcode & 0x00F0) >> 8]) > Byte.MaxValue) ? (byte)1 : (byte)0;
-                            registers[(opcode & 0x0F00) >> 16] += registers[(opcode & 0x00F0) >> 8];
+                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 8] + registers[(opcode & 0x00F0) >> 4]) > Byte.MaxValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 8] += registers[(opcode & 0x00F0) >> 4];
                             programCounter += 2;
                             break;
 
                         //Decrements VX by VY, sets VF to 1 if borrow and 0 if not (0x8XY5)
                         case 0x0005:
-                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 16] - registers[(opcode & 0x00F0) >> 8]) < Byte.MinValue) ? (byte)1 : (byte)0;
-                            registers[(opcode & 0x0F00) >> 16] -= registers[(opcode & 0x00F0) >> 8];
+                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 8] - registers[(opcode & 0x00F0) >> 4]) < Byte.MinValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 8] -= registers[(opcode & 0x00F0) >> 4];
                             programCounter += 2;
                             break;
 
                         //Shifts VX right by 1. VF is set to the bit shifted out (0x8X06)
                         case 0x0006:
                             registers[0xF] = (byte)(registers[(opcode & 0x0F00)] & 0x01);
-                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x0F00)] >> 1);
+                            registers[(opcode & 0x0F00) >> 8] = (byte)(registers[(opcode & 0x0F00)] >> 1);
                             programCounter += 2;
                             break;
 
                         //Sets VX = VY - VX. VF set to 1 if borrow and 0 if not (0x8X07)
                         case 0x0007:
-                            registers[0xF] = (registers[(opcode & 0x00F0) >> 8] - (registers[(opcode & 0x0F00) >> 16]) < Byte.MinValue) ? (byte)1 : (byte)0;
-                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x00F0) >> 8] - registers[(opcode & 0x0F00) >> 16]);
+                            registers[0xF] = (registers[(opcode & 0x00F0) >> 4] - (registers[(opcode & 0x0F00) >> 8]) < Byte.MinValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 8] = (byte)(registers[(opcode & 0x00F0) >> 4] - registers[(opcode & 0x0F00) >> 8]);
                             programCounter += 2;
                             break;
 
                         //Shifts VX left by 1. VF is set to the bit shifted out (0x8X0E)
                         case 0x000E:
                             registers[0xF] = (byte)(registers[(opcode & 0x0F00)] & 0x80);
-                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x0F00)] << 1);
+                            registers[(opcode & 0x0F00) >> 8] = (byte)(registers[(opcode & 0x0F00)] << 1);
                             programCounter += 2;
                             break;
 
@@ -248,7 +248,7 @@ namespace csch8
                     {
                         //Sets VX to the value of the delay timer (0xFX07)
                         case 0x0007:
-                            registers[(opcode & 0x0F00) >> 16] = delayTimer;
+                            registers[(opcode & 0x0F00) >> 8] = delayTimer;
                             programCounter += 2;
                             break;
 
@@ -259,19 +259,19 @@ namespace csch8
 
                         //Sets the delay timer equal to VX (0xFX15)
                         case 0x0015:
-                            delayTimer = registers[(opcode & 0x0F00) >> 16];
+                            delayTimer = registers[(opcode & 0x0F00) >> 8];
                             programCounter += 2;
                             break;
 
                         //Sets the sound timer equal to VX (0xFX18)
                         case 0x0018:
-                            soundTimer = registers[(opcode & 0x0F00) >> 16];
+                            soundTimer = registers[(opcode & 0x0F00) >> 8];
                             programCounter += 2;
                             break;
 
                         //Increments I (address register) by VX (0xFX1E)
                         case 0x001E:
-                            addressRegister += registers[(opcode & 0x0F00) >> 16];
+                            addressRegister += registers[(opcode & 0x0F00) >> 8];
                             programCounter += 2;
                             break;
 
