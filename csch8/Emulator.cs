@@ -68,7 +68,12 @@ namespace csch8
                     {
                         //Display clear, set all disp buffer values to 0
                         case 0x00E0:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
+                            for (int i = 0xF00; i <= 0xFFF; i++)
+                            {
+                                memory[i] = 0;
+                            }
+                            programCounter += 2;
                             break;
 
                         //Return, end subroutine
@@ -110,12 +115,14 @@ namespace csch8
                 
                 //Sets VX = NN (0x6XNN)
                 case 0x6000:
-                    throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                    registers[(opcode & 0x0F00) >> 16] = (byte)(opcode & 0x00FF);
+                    programCounter += 2;
                     break;
 
                 //Increments VX by NN (0x7XNN)
                 case 0x7000:
-                    throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                    registers[(opcode & 0x0F00) >> 16] += (byte)(opcode & 0x00FF);
+                    programCounter += 2;
                     break;
 
                 //9 instructions of format 0x8000
@@ -124,47 +131,64 @@ namespace csch8
                     {
                         //Sets VX = VY (0x8XY0)
                         case 0x0000:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[(opcode & 0x0F00) >> 16] = registers[(opcode & 0x00F0) >> 8];
+                            programCounter += 2;
                             break;
 
                         //Sets VX = VX | VY (0x8XY1), set VF to 0
                         case 0x0001:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[(opcode & 0x0F00) >> 16] |= registers[(opcode & 0x00F0) >> 8];
+                            registers[0xF] = 0;
+                            programCounter += 2;
                             break;
 
                         //Sets VX = VX & VY (0x8XY2), set VF to 0
                         case 0x0002:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[(opcode & 0x0F00) >> 16] &= registers[(opcode & 0x00F0) >> 8];
+                            registers[0xF] = 0;
+                            programCounter += 2;
                             break;
 
                         //Sets VX = VX ^ VY (0x8XY3), set VF to 0
                         case 0x0003:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[(opcode & 0x0F00) >> 16] ^= registers[(opcode & 0x00F0) >> 8];
+                            registers[0xF] = 0;
+                            programCounter += 2;
                             break;
 
                         //Increments VX by VY, sets VF to 1 if carry and 0 if not (0x8XY4)
                         case 0x0004:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 16] + registers[(opcode & 0x00F0) >> 8]) > Byte.MaxValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 16] += registers[(opcode & 0x00F0) >> 8];
+                            programCounter += 2;
                             break;
 
                         //Decrements VX by VY, sets VF to 1 if borrow and 0 if not (0x8XY5)
                         case 0x0005:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[0xF] = ((registers[(opcode & 0x0F00) >> 16] - registers[(opcode & 0x00F0) >> 8]) < Byte.MinValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 16] -= registers[(opcode & 0x00F0) >> 8];
+                            programCounter += 2;
                             break;
 
                         //Shifts VX right by 1. VF is set to the bit shifted out (0x8X06)
                         case 0x0006:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[0xF] = (byte)(registers[(opcode & 0x0F00)] & 0x01);
+                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x0F00)] >> 1);
+                            programCounter += 2;
                             break;
 
-                        //Sts VX = VY - VX. VF set to 1 if borrow and 0 if not (0x8X07)
+                        //Sets VX = VY - VX. VF set to 1 if borrow and 0 if not (0x8X07)
                         case 0x0007:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[0xF] = (registers[(opcode & 0x00F0) >> 8] - (registers[(opcode & 0x0F00) >> 16]) < Byte.MinValue) ? (byte)1 : (byte)0;
+                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x00F0) >> 8] - registers[(opcode & 0x0F00) >> 16]);
+                            programCounter += 2;
                             break;
 
                         //Shifts VX left by 1. VF is set to the bit shifted out (0x8X0E)
                         case 0x000E:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[0xF] = (byte)(registers[(opcode & 0x0F00)] & 0x80);
+                            registers[(opcode & 0x0F00) >> 16] = (byte)(registers[(opcode & 0x0F00)] << 1);
+                            programCounter += 2;
                             break;
 
                         default:
@@ -179,7 +203,8 @@ namespace csch8
 
                 //Sets addressRegister (I) to the address NNN (0xANNN)
                 case 0xA000:
-                    throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                    addressRegister = (ushort)(opcode & 0x0FFF);
+                    programCounter += 2;
                     break;
 
                 //Jumps to the address NNN + V0 (0xBNNN)
@@ -223,7 +248,8 @@ namespace csch8
                     {
                         //Sets VX to the value of the delay timer (0xFX07)
                         case 0x0007:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            registers[(opcode & 0x0F00) >> 16] = delayTimer;
+                            programCounter += 2;
                             break;
 
                         //Halts until key press, which is then stored in VX (0xFX0A)
@@ -233,17 +259,20 @@ namespace csch8
 
                         //Sets the delay timer equal to VX (0xFX15)
                         case 0x0015:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            delayTimer = registers[(opcode & 0x0F00) >> 16];
+                            programCounter += 2;
                             break;
 
                         //Sets the sound timer equal to VX (0xFX18)
                         case 0x0018:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            soundTimer = registers[(opcode & 0x0F00) >> 16];
+                            programCounter += 2;
                             break;
 
                         //Increments I (address register) by VX (0xFX1E)
                         case 0x001E:
-                            throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                            addressRegister += registers[(opcode & 0x0F00) >> 16];
+                            programCounter += 2;
                             break;
 
                         //Sets I (address register) to the location of the sprite for the character in VX; 4x5 font characters 0-F (0xFX29)
