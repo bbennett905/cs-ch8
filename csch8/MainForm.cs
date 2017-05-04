@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Timers;
 
 namespace csch8
 {
@@ -20,6 +21,7 @@ namespace csch8
         private Color primaryColor;
         private Color secondaryColor;
         private Emulator emulator;
+        private System.Timers.Timer timer;
 
         /// <summary>
         /// Draws a frame on the screen.
@@ -40,12 +42,30 @@ namespace csch8
                 {
                     //TODO check if an emu already exists, if so kill it
                     emulator = new Emulator(fileDialog.FileName, dynamicRecompilerToolStripMenuItem.Checked);
+                    timer = new System.Timers.Timer();
+                    timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
+                    timer.Interval = (1000 / 60);
+                    timer.Start();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
             }
+        }
+
+        private void OnTimerTick(object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                emulator.RunCycle();
+                DrawFrame(emulator.memory);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            timer.Start();
         }
 
         private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
