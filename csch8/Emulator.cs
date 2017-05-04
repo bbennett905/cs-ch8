@@ -1,16 +1,37 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace csch8
 {
     class Emulator
     {
-        //0x000-0x1FF (0000 - 0511): Unused or font data
+        private static readonly byte[] fontset =
+        {
+            0xF9, 0x99, 0xF2, // 0
+            0x62, 0x27, // 1
+            0xF1, 0xF8, 0xFF, // 2
+            0x1F, 0x1F, // 3
+            0x99, 0xF1, 0x1F, // 4
+            0x8F, 0x1F, // 5
+            0xF8, 0xF9, 0xFF, // 6
+            0x12, 0x44, // 7
+            0xF9, 0xF9, 0xFF, // 8
+            0x9F, 0x1F, // 9
+            0xF9, 0xF9, 0x9E, // A
+            0x9E, 0x9E, // B
+            0xF8, 0x88, 0xFE, // C
+            0x99, 0x9E, // D
+            0xF8, 0xF8, 0xFF, // E
+            0x8F, 0x88  // F
+        };
+
+        //0x000-0x1FF (0000 - 0511): Unused or font data (each font sprite takes up 40 bits (5 bytes))
         //0x200-0xE9F (0512 - 3743): Program/ROM
         //0xEA0-0xEFF (3744 - 3839): Call stack/ other internal use
         //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
-        private byte[] memory = new byte[4096];
+        public byte[] memory = new byte[4096];
 
         //16, 8 bit data registers: V0-VF. VF may be a flag register for some instructions
         private byte[] registers = new byte[16];
@@ -44,6 +65,8 @@ namespace csch8
             set { dynamicRecompiler = value; }
         }
 
+        Random random;
+
         public Emulator(string filename, bool dynaRec = false)
         {
             dynamicRecompiler = dynaRec;
@@ -61,6 +84,9 @@ namespace csch8
             fs.Close();
 
             programCounter = 512;
+            random = new Random();
+
+            Array.Copy(fontset, 0, memory, 0, fontset.Length);
         }
 
         public void RunCycle()
@@ -92,7 +118,8 @@ namespace csch8
 
                             //Return, end subroutine
                             case 0x00EE:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                programCounter = stack[stackPointer];
+                                stackPointer--;
                                 break;
 
                             //Calls RCA1802 program at NNN (0x0NNN), rarely used
@@ -109,22 +136,45 @@ namespace csch8
 
                     //Call subroutine at NNN (0x2NNN)
                     case 0x2000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        stack[stackPointer] = programCounter;
+                        stackPointer++;
+                        programCounter = (ushort)(opcode & 0x0FFF);
                         break;
 
                     //Skip next instruction if VX == NN (0x3XNN)
                     case 0x3000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        if (registers[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
+                        {
+                            programCounter += 4;
+                        }
+                        else
+                        {
+                            programCounter += 2;
+                        }
                         break;
 
                     //Skip next instruction if VX != NN (0x4XNN)
                     case 0x4000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        if (registers[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
+                        {
+                            programCounter += 4;
+                        }
+                        else
+                        {
+                            programCounter += 2;
+                        }
                         break;
 
                     //Skip next instruction if VX == VY (0x5XY0)
                     case 0x5000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        if (registers[(opcode & 0x0F00) >> 8] == registers[(opcode & 0x00F0) >> 4])
+                        {
+                            programCounter += 4;
+                        }
+                        else
+                        {
+                            programCounter += 2;
+                        }
                         break;
 
                     //Sets VX = NN (0x6XNN)
@@ -212,7 +262,14 @@ namespace csch8
 
                     //Skip next instruction if VX != VY (0x9XY0)
                     case 0x9000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        if (registers[(opcode & 0x0F00) >> 8] != registers[(opcode & 0x00F0) >> 4])
+                        {
+                            programCounter += 4;
+                        }
+                        else
+                        {
+                            programCounter += 2;
+                        }
                         break;
 
                     //Sets addressRegister (I) to the address NNN (0xANNN)
@@ -228,13 +285,34 @@ namespace csch8
 
                     //Sets VX = rand() & NN (0xCXNN)
                     case 0xC000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        registers[(opcode & 0x0F00) >> 8] = (byte)((opcode & 0x00FF) & random.Next(Byte.MinValue, Byte.MaxValue + 1));
+                        programCounter += 2;
                         break;
 
                     //Draws a sprite at coordinate (VX, VY) with a width of 8 and height of N px, starting at memory location I. (Use XOR)s
                     //Set VF to 1 if any pixels are flipped from set to unset, otherwise 0. (0xDXYN)
                     case 0xD000:
-                        throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                        //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
+                        byte x = registers[(opcode & 0x0F00) >> 8];
+                        byte y = registers[(opcode & 0x00F0) >> 4];
+                        byte h = (byte)(opcode & 0x000F);
+
+                        registers[0xF] = 0;
+
+                        for (int pos = 0; pos < 8 * h; pos++)
+                        {
+                            //first check if we're supposed to draw a bit here
+                            if ((memory[addressRegister + (pos / 8)] & (1 << (8 - (pos % 8)))) == 1)
+                            {
+                                //pos is the number of BITS past 0xF00
+                                //this might be totally wrong
+                                if ((memory[0xF00 + (pos / 8)] & (1 << (8 - (pos % 8)))) == 1)
+                                {
+                                    registers[0xF] = 1;
+                                }
+                                memory[0xF00 + (pos / 8)] ^= (byte)(1 << (8 - (pos % 8)));
+                            }
+                        }
                         break;
 
                     //2 instructions of format 0xE000
@@ -243,12 +321,26 @@ namespace csch8
                         {
                             //Skip next instruction if key stored in VX is pressed (0xEX9E)
                             case 0x009E:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                if (keys[registers[(opcode & 0x0F00) >> 8]] == 1)
+                                {
+                                    programCounter += 4;
+                                }
+                                else
+                                {
+                                    programCounter += 2;
+                                }
                                 break;
 
                             //Skip next instruction if key stored in VX isn't pressed (0xEXA1)
                             case 0x00A1:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                if (keys[registers[(opcode & 0x0F00) >> 8]] == 0)
+                                {
+                                    programCounter += 4;
+                                }
+                                else
+                                {
+                                    programCounter += 2;
+                                }
                                 break;
 
                             default:
@@ -268,7 +360,16 @@ namespace csch8
 
                             //Halts until key press, which is then stored in VX (0xFX0A)
                             case 0x000A:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                //Don't increment program counter, unless a key is pressed
+                                for (byte i = 0; i < keys.Length; i++)
+                                {
+                                    if (keys[i] == 1)
+                                    {
+                                        registers[(opcode & 0x0F00) >> 8] = i;
+                                        programCounter += 2;
+                                        break;
+                                    }
+                                }
                                 break;
 
                             //Sets the delay timer equal to VX (0xFX15)
@@ -291,12 +392,16 @@ namespace csch8
 
                             //Sets I (address register) to the location of the sprite for the character in VX; 4x5 font characters 0-F (0xFX29)
                             case 0x0029:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                //0x000-0x1FF (0000 - 0511): Unused or font data (each font sprite takes up 40 bits (5 bytes))
+                                addressRegister = (ushort)(5 * registers[(opcode & 0x0F00) >> 8]);
                                 break;
 
                             //Store the BCD representation of VX at I, I+1, I+2 (0xFX33)
                             case 0x0033:
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                memory[addressRegister] = (byte)(registers[(opcode & 0x0F00) >> 8] / 100);
+                                memory[addressRegister] = (byte)((registers[(opcode & 0x0F00) >> 8] / 10) % 10);
+                                memory[addressRegister] = (byte)((registers[(opcode & 0x0F00) >> 8] % 100) % 10);
+                                programCounter += 2;
                                 break;
 
                             //Stores V0-VX (inclusive) in memory starting at address I (0xFX55)
@@ -324,6 +429,19 @@ namespace csch8
 
                     default:
                         throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
+                }
+                if (delayTimer > 0)
+                {
+                    delayTimer--;
+                }
+
+                if (soundTimer > 0)
+                {
+                    if (soundTimer == 1)
+                    {
+                        MessageBox.Show("Beep");
+                    }
+                    soundTimer--;
                 }
             }
         }
