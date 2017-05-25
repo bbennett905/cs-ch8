@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Timers;
+using System.Collections.Generic;
 
 namespace csch8
 {
@@ -16,20 +17,69 @@ namespace csch8
         public MainForm()
         {
             InitializeComponent();
+            primaryBrush = new SolidBrush(Color.DarkSlateGray);
+            secondaryBrush = new SolidBrush(Color.AntiqueWhite);
+            graphics = CreateGraphics();
         }
 
-        private Color primaryColor;
-        private Color secondaryColor;
+        //private Color primaryColor;
+        //private Color secondaryColor;
+        private Graphics graphics;
+        private SolidBrush primaryBrush;
+        private SolidBrush secondaryBrush;
         private Emulator emulator;
         private System.Timers.Timer timer;
 
+        delegate void SetUshortCallback(ushort us);
+        private void SetPCLabel(ushort pc)
+        {
+            if (pc_label.InvokeRequired)
+            {
+                SetUshortCallback us = new SetUshortCallback(SetPCLabel);
+                pc_label.Invoke(us, pc);
+            }
+            else
+            {
+                pc_label.Text = "PC: " + pc.ToString("X4");
+            }
+        }
+        
+        private void SetOpcodeLabel(ushort op)
+        {
+            if (opcode_label.InvokeRequired)
+            {
+                SetUshortCallback us = new SetUshortCallback(SetOpcodeLabel);
+                opcode_label.Invoke(us, op);
+            }
+            else
+            {
+                opcode_label.Text = "Op: " + op.ToString("X4");
+            }
+        }
         /// <summary>
         /// Draws a frame on the screen.
         /// </summary>
-        /// <param name="memory">Takes chip8 memory by referencee</param>
+        /// <param name="memory">Takes chip8 memory by reference</param>
         public void DrawFrame(byte[] memory)
         {
+            SetPCLabel(emulator.ProgramCounter);
+            SetOpcodeLabel(emulator.CurrentOpcode);
             //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
+            byte[] temp = new byte[256];
+            Array.Copy(memory, 3840, temp, 0, 256);
+            BitArray ba = new BitArray(temp);
+
+            List<Rectangle> list = new List<Rectangle>(ba.Length);
+
+            for (int i = 0; i < ba.Length; i++)
+            {
+                list.Add(new Rectangle(10 * (i  % 64), 24 + 10 * (i / 64), 10, 10));
+                //graphics.FillRectangle(primaryBrush, r);
+            }
+            Rectangle bg = new Rectangle(0, 24, 640, 320);
+            graphics.FillRectangle(secondaryBrush, bg);
+
+            graphics.FillRectangles(primaryBrush, list.ToArray());
         }
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -37,14 +87,13 @@ namespace csch8
             OpenFileDialog fileDialog = new OpenFileDialog();
             if (fileDialog.ShowDialog() == DialogResult.OK)
             {
-                MessageBox.Show(fileDialog.FileName, "PLACEHOLDER");
                 try
                 {
                     //TODO check if an emu already exists, if so kill it
                     emulator = new Emulator(fileDialog.FileName, dynamicRecompilerToolStripMenuItem.Checked);
                     timer = new System.Timers.Timer();
                     timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-                    timer.Interval = (1000 / 60);
+                    timer.Interval = (1000 / 10);
                     timer.Start();
                 }
                 catch (Exception ex)
@@ -120,13 +169,13 @@ namespace csch8
             ColorDialog cd = new ColorDialog();
             cd.ShowDialog();
 
-            primaryColor = cd.Color;
+            primaryBrush.Color = cd.Color;
 
-            Rectangle rect = new Rectangle(0, 24, 10, 10);
+            /*Rectangle rect = new Rectangle(0, 24, 10, 10);
             SolidBrush brush = new SolidBrush(cd.Color);
             Graphics graphics;
             graphics = CreateGraphics();
-            graphics.FillRectangle(brush, rect);
+            graphics.FillRectangle(brush, rect);*/
         }
 
         private void SecondaryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -134,13 +183,14 @@ namespace csch8
             ColorDialog cd = new ColorDialog();
             cd.ShowDialog();
 
-            secondaryColor = cd.Color;
+            secondaryBrush.Color = cd.Color;
 
-            Rectangle rect = new Rectangle(10, 24, 10, 10);
+            /*Rectangle rect = new Rectangle(10, 24, 10, 10);
             SolidBrush brush = new SolidBrush(cd.Color);
             Graphics graphics;
             graphics = CreateGraphics();
-            graphics.FillRectangle(brush, rect);
+            graphics.FillRectangle(brush, rect);*/
         }
+
     }
 }

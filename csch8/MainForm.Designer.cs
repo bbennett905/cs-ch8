@@ -42,6 +42,8 @@
             this.secondaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.showFPSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pc_label = new System.Windows.Forms.Label();
+            this.opcode_label = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -97,7 +99,7 @@
             this.interpreterToolStripMenuItem,
             this.dynamicRecompilerToolStripMenuItem});
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.cPUToolStripMenuItem.Text = "&CPU";
             // 
             // interpreterToolStripMenuItem
@@ -124,7 +126,7 @@
             this.toolStripSeparator1,
             this.showFPSToolStripMenuItem});
             this.graphicsToolStripMenuItem.Name = "graphicsToolStripMenuItem";
-            this.graphicsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.graphicsToolStripMenuItem.Size = new System.Drawing.Size(120, 22);
             this.graphicsToolStripMenuItem.Text = "&Graphics";
             // 
             // setColorsToolStripMenuItem
@@ -133,40 +135,60 @@
             this.primaryToolStripMenuItem,
             this.secondaryToolStripMenuItem});
             this.setColorsToolStripMenuItem.Name = "setColorsToolStripMenuItem";
-            this.setColorsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setColorsToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.setColorsToolStripMenuItem.Text = "Set &Colors";
             // 
             // primaryToolStripMenuItem
             // 
             this.primaryToolStripMenuItem.Name = "primaryToolStripMenuItem";
-            this.primaryToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.primaryToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.primaryToolStripMenuItem.Text = "&Primary...";
             this.primaryToolStripMenuItem.Click += new System.EventHandler(this.PrimaryToolStripMenuItem_Click);
             // 
             // secondaryToolStripMenuItem
             // 
             this.secondaryToolStripMenuItem.Name = "secondaryToolStripMenuItem";
-            this.secondaryToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.secondaryToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.secondaryToolStripMenuItem.Text = "S&econdary...";
             this.secondaryToolStripMenuItem.Click += new System.EventHandler(this.SecondaryToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(124, 6);
             // 
             // showFPSToolStripMenuItem
             // 
             this.showFPSToolStripMenuItem.CheckOnClick = true;
             this.showFPSToolStripMenuItem.Name = "showFPSToolStripMenuItem";
-            this.showFPSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showFPSToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.showFPSToolStripMenuItem.Text = "Show &FPS";
+            // 
+            // pc_label
+            // 
+            this.pc_label.AutoSize = true;
+            this.pc_label.Location = new System.Drawing.Point(555, 6);
+            this.pc_label.Name = "pc_label";
+            this.pc_label.Size = new System.Drawing.Size(62, 13);
+            this.pc_label.TabIndex = 1;
+            this.pc_label.Text = "PC: 0xFFFF";
+            // 
+            // opcode_label
+            // 
+            this.opcode_label.AutoSize = true;
+            this.opcode_label.Location = new System.Drawing.Point(487, 6);
+            this.opcode_label.Name = "opcode_label";
+            this.opcode_label.Size = new System.Drawing.Size(62, 13);
+            this.opcode_label.TabIndex = 2;
+            this.opcode_label.Text = "Op: 0xFFFF";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 305);
+            this.Controls.Add(this.opcode_label);
+            this.Controls.Add(this.pc_label);
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
@@ -198,6 +220,8 @@
         private System.Windows.Forms.ToolStripMenuItem showFPSToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem primaryToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem secondaryToolStripMenuItem;
+        private System.Windows.Forms.Label pc_label;
+        private System.Windows.Forms.Label opcode_label;
     }
 }
 

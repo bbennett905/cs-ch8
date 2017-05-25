@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace csch8
 {
@@ -38,10 +39,18 @@ namespace csch8
 
         //16bit address register, called I
         private ushort addressRegister;
-
+       
         //16bit PC
         private ushort programCounter;
+        public ushort ProgramCounter
+        {
+            get { return programCounter; }
+        }
 
+        public ushort CurrentOpcode
+        {
+            get { return (ushort)(memory[programCounter] << 8 | memory[programCounter + 1]); }
+        }
         //Array holding graphics data: 1 = black, 0 = white
         //Converted to SDL_Point array in renderer
         //NOTE: this should be located in memory, leave it as this for the moment
@@ -65,7 +74,10 @@ namespace csch8
             set { dynamicRecompiler = value; }
         }
 
-        Random random;
+        private Random random;
+
+        //
+        private Stack<ushort> history;
 
         public Emulator(string filename, bool dynaRec = false)
         {
@@ -124,6 +136,7 @@ namespace csch8
 
                             //Calls RCA1802 program at NNN (0x0NNN), rarely used
                             default:
+                                programCounter += 2;
                                 throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
                                 break;
                         }
@@ -256,6 +269,8 @@ namespace csch8
                                 break;
 
                             default:
+                                programCounter += 2;
+                                //TODO PROGRAMCOUNTER ERROR OUTPUT IS OFF BY 2
                                 throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
                         }
                         break;
@@ -313,6 +328,7 @@ namespace csch8
                                 memory[0xF00 + (pos / 8)] ^= (byte)(1 << (8 - (pos % 8)));
                             }
                         }
+                        programCounter += 2;
                         break;
 
                     //2 instructions of format 0xE000
@@ -344,6 +360,7 @@ namespace csch8
                                 break;
 
                             default:
+                                programCounter += 2;
                                 throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
                         }
                         break;
@@ -394,6 +411,7 @@ namespace csch8
                             case 0x0029:
                                 //0x000-0x1FF (0000 - 0511): Unused or font data (each font sprite takes up 40 bits (5 bytes))
                                 addressRegister = (ushort)(5 * registers[(opcode & 0x0F00) >> 8]);
+                                programCounter += 2;
                                 break;
 
                             //Store the BCD representation of VX at I, I+1, I+2 (0xFX33)
@@ -423,11 +441,13 @@ namespace csch8
                                 break;
 
                             default:
+                                programCounter += 2;
                                 throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
                         }
                         break;
 
                     default:
+                        programCounter += 2;
                         throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
                 }
                 if (delayTimer > 0)
