@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Text;
+using System.Linq;
+using System.Media;
 using System.Windows.Forms;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace csch8
@@ -326,24 +328,54 @@ namespace csch8
                         //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
                         byte x = registers[(opcode & 0x0F00) >> 8];
                         byte y = registers[(opcode & 0x00F0) >> 4];
+
                         byte h = (byte)(opcode & 0x000F);
 
                         registers[0xF] = 0;
 
-                        for (int pos = 0; pos < 8 * h; pos++)
+                        byte[] temp = new byte[h];
+                        Array.Copy(memory, addressRegister, temp, 0, temp.Length);
+                        BitArray spriteBA = new BitArray(temp);
+
+                        byte[] temp2 = new byte[256];
+                        Array.Copy(memory, 3840, temp2, 0, 256);
+                        BitArray gfxBA = new BitArray(temp2);
+
+                        for (int pos = 0; pos < spriteBA.Count; pos++)
                         {
                             //first check if we're supposed to draw a bit here
-                            if ((memory[addressRegister + (pos / 8)] & (1 << (8 - (pos % 8)))) == 1)
+                            if (spriteBA[pos])
                             {
-                                //pos is the number of BITS past 0xF00
-                                //this might be totally wrong
-                                if ((memory[0xF00 + (pos / 8)] & (1 << (8 - (pos % 8)))) == 1)
+                                int xSpritePos = pos % 8;
+                                int ySpritePos = pos / 8;
+
+                                int xPos = x + xSpritePos;
+                                int yPos = y + ySpritePos;
+                                if (xPos >= 64)
+                                    continue;
+                                if (yPos >= 32)
+                                    throw new ArgumentException("y was wrong");
+
+                                int i = xPos + (64 * yPos);
+                                if (i > gfxBA.Count)
+                                    throw new ArgumentException("i value is wrong");
+                                if (gfxBA[i])
                                 {
                                     registers[0xF] = 1;
                                 }
-                                memory[0xF00 + (pos / 8)] ^= (byte)(1 << (8 - (pos % 8)));
+                                
+                                
+                                
+                                //gfxBA[(x + xPos) + (64 * (y + yPos))] ^= true;
+                                memory[0xF00 + i / 8] ^= (byte)(1 << (7 - (i % 8)));
+
+                                //memory[0xF00 + ((x + (pos % 8) + ((y + (pos / 8)) * 64))) / 8] ^= 
+                                //    (byte)(1 << 8 - ((x + (pos % 8) + ((y + (pos / 8)) * 64)) + pos) % 8);
+                                //memory[0xF00 + ((pos + x + (y * 64)) / 8)] ^= 1;//(byte)(1 << (8 - (pos % 8)));
                             }
                         }
+                        
+                        //gfxBA.CopyTo(memory, 3840);
                         programCounter += 2;
                         break;
 
