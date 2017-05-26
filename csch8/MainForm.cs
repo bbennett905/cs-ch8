@@ -193,5 +193,18 @@ namespace csch8
             graphics.FillRectangle(brush, rect);*/
         }
 
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            if (emulator.Paused)
+            {
+                emulator.Paused = false;
+                pauseButton.Text = "Pause";
+            }
+            else
+            {
+                emulator.Paused = true;
+                pauseButton.Text = "Resume";
+            }
+        }
     }
 }

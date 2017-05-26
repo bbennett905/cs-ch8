@@ -51,6 +51,8 @@ namespace csch8
         {
             get { return (ushort)(memory[programCounter] << 8 | memory[programCounter + 1]); }
         }
+
+        public bool Paused = false;
         //Array holding graphics data: 1 = black, 0 = white
         //Converted to SDL_Point array in renderer
         //NOTE: this should be located in memory, leave it as this for the moment
@@ -103,6 +105,10 @@ namespace csch8
 
         public void RunCycle()
         {
+            if (Paused)
+            {
+                return;
+            }
             if (dynamicRecompiler)
             {
                 throw new NotImplementedException("Dynamic recompilation is not yet available");

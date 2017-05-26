@@ -44,6 +44,7 @@
             this.showFPSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pc_label = new System.Windows.Forms.Label();
             this.opcode_label = new System.Windows.Forms.Label();
+            this.pauseButton = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -182,11 +183,21 @@
             this.opcode_label.TabIndex = 2;
             this.opcode_label.Text = "Op: 0xFFFF";
             // 
+            // pauseButton
+            // 
+            this.pauseButton.Location = new System.Drawing.Point(425, 0);
+            this.pauseButton.Name = "pauseButton";
+            this.pauseButton.Size = new System.Drawing.Size(56, 24);
+            this.pauseButton.TabIndex = 3;
+            this.pauseButton.Text = "Pause";
+            this.pauseButton.UseVisualStyleBackColor = true;
+            this.pauseButton.Click += new System.EventHandler(this.PauseButton_Click);
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(624, 305);
+            this.Controls.Add(this.pauseButton);
             this.Controls.Add(this.opcode_label);
             this.Controls.Add(this.pc_label);
             this.Controls.Add(this.menuStrip1);
@@ -222,6 +233,7 @@
         private System.Windows.Forms.ToolStripMenuItem secondaryToolStripMenuItem;
         private System.Windows.Forms.Label pc_label;
         private System.Windows.Forms.Label opcode_label;
+        private System.Windows.Forms.Button pauseButton;
     }
 }
 
