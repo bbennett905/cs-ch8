@@ -474,7 +474,7 @@ namespace csch8
                 {
                     if (soundTimer == 1)
                     {
-                        MessageBox.Show("Beep");
+                        SystemSounds.Beep.Play();
                     }
                     soundTimer--;
                 }
