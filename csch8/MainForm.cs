@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Timers;
+//using System.Timers;
 using System.Collections.Generic;
 
 namespace csch8
@@ -28,7 +28,7 @@ namespace csch8
         private SolidBrush primaryBrush;
         private SolidBrush secondaryBrush;
         private Emulator emulator;
-        private System.Timers.Timer timer;
+        private System.Windows.Forms.Timer timer;
 
         delegate void SetUshortCallback(ushort us);
         private void SetPCLabel(ushort pc)
@@ -91,9 +91,10 @@ namespace csch8
                 {
                     //TODO check if an emu already exists, if so kill it
                     emulator = new Emulator(fileDialog.FileName, dynamicRecompilerToolStripMenuItem.Checked);
-                    timer = new System.Timers.Timer();
-                    timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-                    timer.Interval = (1000 / 10);
+                    timer = new System.Windows.Forms.Timer();
+                    timer.Tick += new EventHandler(OnTimerTick);
+                   // timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
+                    timer.Interval = (1000 / 60);
                     timer.Start();
                 }
                 catch (Exception ex)
@@ -103,7 +104,7 @@ namespace csch8
             }
         }
 
-        private void OnTimerTick(object source, ElapsedEventArgs e)
+        private void OnTimerTick(object source, EventArgs e)
         {
             try
             {
