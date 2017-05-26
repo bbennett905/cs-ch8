@@ -137,7 +137,7 @@ namespace csch8
                             //Calls RCA1802 program at NNN (0x0NNN), rarely used
                             default:
                                 programCounter += 2;
-                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter:X2} has not yet been implemented");
+                                throw new NotImplementedException($"Opcode {opcode:X2} at location {programCounter - 2:X2} has not yet been implemented");
                                 break;
                         }
                         break;
@@ -270,8 +270,7 @@ namespace csch8
 
                             default:
                                 programCounter += 2;
-                                //TODO PROGRAMCOUNTER ERROR OUTPUT IS OFF BY 2
-                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
+                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter - 2:X2}");
                         }
                         break;
 
@@ -361,7 +360,7 @@ namespace csch8
 
                             default:
                                 programCounter += 2;
-                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
+                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter - 2:X2}");
                         }
                         break;
 
@@ -442,13 +441,13 @@ namespace csch8
 
                             default:
                                 programCounter += 2;
-                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
+                                throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter - 2:X2}");
                         }
                         break;
 
                     default:
                         programCounter += 2;
-                        throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter:X2}");
+                        throw new InvalidOperationException($"Unrecognized opcode {opcode:X2} at location {programCounter - 2:X2}");
                 }
                 if (delayTimer > 0)
                 {
