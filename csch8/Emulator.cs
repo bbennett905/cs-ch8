@@ -132,7 +132,7 @@ namespace csch8
                 {
                     //3 instructions of format 0x0NNN
                     case 0x0000:
-                        switch (opcode & 0x0FF)
+                        switch (opcode & 0x00FF)
                         {
                             //Display clear, set all disp buffer values to 0
                             case 0x00E0:
@@ -146,8 +146,8 @@ namespace csch8
 
                             //Return, end subroutine
                             case 0x00EE:
-                                programCounter = stack[stackPointer];
                                 stackPointer--;
+                                programCounter = stack[stackPointer];
                                 break;
 
                             //Calls RCA1802 program at NNN (0x0NNN), rarely used
