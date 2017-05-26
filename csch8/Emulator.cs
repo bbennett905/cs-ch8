@@ -148,6 +148,7 @@ namespace csch8
                             case 0x00EE:
                                 stackPointer--;
                                 programCounter = stack[stackPointer];
+                                programCounter += 2;
                                 break;
 
                             //Calls RCA1802 program at NNN (0x0NNN), rarely used
