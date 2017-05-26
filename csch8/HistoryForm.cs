@@ -30,7 +30,8 @@ namespace csch8
             foreach (ushort pc_val in history)
             {
                 labels[i].Text = pc_val.ToString("X4");
-                labels[i + 1].Text = memory[pc_val].ToString("X4");
+                ushort opcode = (ushort)(memory[pc_val] << 8 | memory[pc_val + 1]);
+                labels[i + 1].Text = opcode.ToString("X4");
                 i += 2;
             }
         }
