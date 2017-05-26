@@ -29,6 +29,7 @@ namespace csch8
         private SolidBrush secondaryBrush;
         private Emulator emulator;
         private System.Windows.Forms.Timer timer;
+        private HistoryForm histForm;
 
         delegate void SetUshortCallback(ushort us);
         private void SetPCLabel(ushort pc)
@@ -64,6 +65,10 @@ namespace csch8
         {
             SetPCLabel(emulator.ProgramCounter);
             SetOpcodeLabel(emulator.CurrentOpcode);
+            if (histForm != null)
+            {
+                histForm.Update(emulator.History, memory);
+            }
             //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
             byte[] temp = new byte[256];
             Array.Copy(memory, 3840, temp, 0, 256);
@@ -207,6 +212,50 @@ namespace csch8
                 pauseButton.Text = "Resume";
             }
         }
+
+        private void ViewHistoryButton_Click(object sender, EventArgs e)
+        {
+            if (histForm != null)
+            {
+                histForm.Hide();
+                histForm = null;
+            }
+            else
+            {
+                histForm = new HistoryForm()
+                {
+                    Location = new System.Drawing.Point(Right, Top - 20)
+                };
+                histForm.Show(this);
+            }
+        }
+
+        protected override void OnMove(EventArgs e)
+        {
+            base.OnMove(e);
+            if (histForm != null)
+            {
+                histForm.Location = new System.Drawing.Point(Right, Top - 20);
+            }
+        }
+
+        private void HistoryToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if (histForm != null)
+            {
+                histForm.Hide();
+                histForm = null;
+            }
+            else
+            {
+                histForm = new HistoryForm()
+                {
+                    Location = new System.Drawing.Point(Right, Top - 20)
+                };
+                histForm.Show(this);
+            }
+        }
+
         private void FPSSelector_Changed(object sender, EventArgs e)
         {
             timer.Interval = (1000 / (int)fpsSelector.Value);

@@ -78,11 +78,16 @@ namespace csch8
 
         private Random random;
 
-        //
-        private Stack<ushort> history;
+        //Stores last 10 PC values for debugging purposes
+        private Queue<ushort> history;
+        public Queue<ushort> History
+        {
+            get { return history; }
+        }
 
         public Emulator(string filename, bool dynaRec = false)
         {
+            history = new Queue<ushort>(20);
             dynamicRecompiler = dynaRec;
             System.IO.FileStream fs = File.Open(filename, FileMode.Open);
 
@@ -116,6 +121,11 @@ namespace csch8
             else
             {
                 ushort opcode = (ushort)(memory[programCounter] << 8 | memory[programCounter + 1]);
+                if (history.Count >= 20)
+                {
+                    history.Dequeue();
+                }
+                history.Enqueue(programCounter);
 
                 //for most opcodes, increment pc by 2
                 switch (opcode & 0xF000)

@@ -42,6 +42,8 @@
             this.secondaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.showFPSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.historyToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.pc_label = new System.Windows.Forms.Label();
             this.opcode_label = new System.Windows.Forms.Label();
             this.pauseButton = new System.Windows.Forms.Button();
@@ -54,7 +56,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.settingsToolStripMenuItem});
+            this.settingsToolStripMenuItem,
+            this.debugToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(624, 24);
@@ -167,6 +170,21 @@
             this.showFPSToolStripMenuItem.Size = new System.Drawing.Size(127, 22);
             this.showFPSToolStripMenuItem.Text = "Show &FPS";
             // 
+            // debugToolStripMenuItem
+            // 
+            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.historyToolStripMenuItem2});
+            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.debugToolStripMenuItem.Text = "&Debug";
+            // 
+            // historyToolStripMenuItem2
+            // 
+            this.historyToolStripMenuItem2.Name = "historyToolStripMenuItem2";
+            this.historyToolStripMenuItem2.Size = new System.Drawing.Size(121, 22);
+            this.historyToolStripMenuItem2.Text = "&History...";
+            this.historyToolStripMenuItem2.Click += new System.EventHandler(this.HistoryToolStripMenuItem2_Click);
+            // 
             // pc_label
             // 
             this.pc_label.AutoSize = true;
@@ -259,6 +277,8 @@
         private System.Windows.Forms.Label pc_label;
         private System.Windows.Forms.Label opcode_label;
         private System.Windows.Forms.Button pauseButton;
+        private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem historyToolStripMenuItem2;
         private System.Windows.Forms.NumericUpDown fpsSelector;
     }
 }
