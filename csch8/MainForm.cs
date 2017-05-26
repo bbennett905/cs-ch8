@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-//using System.Timers;
 using System.Collections.Generic;
 
 namespace csch8
@@ -22,8 +16,6 @@ namespace csch8
             graphics = CreateGraphics();
         }
 
-        //private Color primaryColor;
-        //private Color secondaryColor;
         private Graphics graphics;
         private SolidBrush primaryBrush;
         private SolidBrush secondaryBrush;
@@ -79,15 +71,20 @@ namespace csch8
 
             for (int i = 0; i < ba.Length; i++)
             {
-                list.Add(new Rectangle(10 * (i  % 64), 24 + 10 * (i / 64), 10, 10));
+                if (ba[i])
+                {
+                    list.Add(new Rectangle(10 * (i % 64), 24 + 10 * (i / 64), 10, 10));
+                }
                 //graphics.FillRectangle(primaryBrush, r);
             }
             Rectangle bg = new Rectangle(0, 24, 640, 320);
 
             //TODO "manual" double buffering using bitmap may help with screen tearing
             graphics.FillRectangle(secondaryBrush, bg);
-
-            graphics.FillRectangles(primaryBrush, list.ToArray());
+            if (list.Count > 0)
+            {
+                graphics.FillRectangles(primaryBrush, list.ToArray());
+            }
         }
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
