@@ -69,6 +69,7 @@ namespace csch8
             {
                 histForm.Update(emulator.History, memory);
             }
+            if (emulator.Paused) return;
             //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
             byte[] temp = new byte[256];
             Array.Copy(memory, 3840, temp, 0, 256);
