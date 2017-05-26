@@ -83,6 +83,8 @@ namespace csch8
                 //graphics.FillRectangle(primaryBrush, r);
             }
             Rectangle bg = new Rectangle(0, 24, 640, 320);
+
+            //TODO "manual" double buffering using bitmap may help with screen tearing
             graphics.FillRectangle(secondaryBrush, bg);
 
             graphics.FillRectangles(primaryBrush, list.ToArray());
@@ -177,12 +179,6 @@ namespace csch8
             cd.ShowDialog();
 
             primaryBrush.Color = cd.Color;
-
-            /*Rectangle rect = new Rectangle(0, 24, 10, 10);
-            SolidBrush brush = new SolidBrush(cd.Color);
-            Graphics graphics;
-            graphics = CreateGraphics();
-            graphics.FillRectangle(brush, rect);*/
         }
 
         private void SecondaryToolStripMenuItem_Click(object sender, EventArgs e)
@@ -191,12 +187,6 @@ namespace csch8
             cd.ShowDialog();
 
             secondaryBrush.Color = cd.Color;
-
-            /*Rectangle rect = new Rectangle(10, 24, 10, 10);
-            SolidBrush brush = new SolidBrush(cd.Color);
-            Graphics graphics;
-            graphics = CreateGraphics();
-            graphics.FillRectangle(brush, rect);*/
         }
 
         private void PauseButton_Click(object sender, EventArgs e)
@@ -259,7 +249,10 @@ namespace csch8
 
         private void FPSSelector_Changed(object sender, EventArgs e)
         {
-            timer.Interval = (1000 / (int)fpsSelector.Value);
+            if (timer != null)
+            {
+                timer.Interval = (1000 / (int)fpsSelector.Value);
+            }
         }
     }
 }

@@ -243,6 +243,7 @@
             this.Controls.Add(this.opcode_label);
             this.Controls.Add(this.pc_label);
             this.Controls.Add(this.menuStrip1);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
