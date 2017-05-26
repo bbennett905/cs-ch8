@@ -195,6 +195,7 @@ namespace csch8
 
         private void PauseButton_Click(object sender, EventArgs e)
         {
+            if (emulator == null) return;
             if (emulator.Paused)
             {
                 emulator.Paused = false;
