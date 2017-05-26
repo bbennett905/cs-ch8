@@ -94,7 +94,7 @@ namespace csch8
                     timer = new System.Windows.Forms.Timer();
                     timer.Tick += new EventHandler(OnTimerTick);
                    // timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
-                    timer.Interval = (1000 / 60);
+                    timer.Interval = (1000 / (int)fpsSelector.Value);
                     timer.Start();
                 }
                 catch (Exception ex)
@@ -205,6 +205,10 @@ namespace csch8
                 emulator.Paused = true;
                 pauseButton.Text = "Resume";
             }
+        }
+        private void FPSSelector_Changed(object sender, EventArgs e)
+        {
+            timer.Interval = (1000 / (int)fpsSelector.Value);
         }
     }
 }
