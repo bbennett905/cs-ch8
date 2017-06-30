@@ -69,7 +69,7 @@ namespace csch8
         private ushort stackPointer;
 
         //Keys input, 0x0-0xF
-        private byte[] keys = new byte[16];
+        public byte[] Keys = new byte[16];
 
         private bool dynamicRecompiler;
         public bool DynamicRecompiler
