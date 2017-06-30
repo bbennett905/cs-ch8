@@ -23,6 +23,7 @@ namespace csch8
         private Emulator emulator;
         private System.Windows.Forms.Timer timer;
         private HistoryForm histForm;
+        private RegistersForm regForm;
 
         delegate void SetUshortCallback(ushort us);
         private void SetPCLabel(ushort pc)
@@ -61,6 +62,10 @@ namespace csch8
             if (histForm != null)
             {
                 histForm.Update(emulator.History, memory);
+            }
+            if (regForm != null)
+            {
+                regForm.Update(emulator.Registers, emulator.ProgramCounter, emulator.AddressRegister, emulator.DelayTimer, emulator.SoundTimer);
             }
             if (emulator.Paused) return;
             //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
@@ -207,7 +212,11 @@ namespace csch8
             base.OnMove(e);
             if (histForm != null)
             {
-                histForm.Location = new System.Drawing.Point(Right, Top - 20);
+                histForm.Location = new System.Drawing.Point(Right - 7, Top);
+            }
+            if (regForm != null)
+            {
+                regForm.Location = new System.Drawing.Point(Right + 160, Top);
             }
         }
 
@@ -222,9 +231,22 @@ namespace csch8
             {
                 histForm = new HistoryForm()
                 {
-                    Location = new System.Drawing.Point(Right, Top - 20)
+                    Location = new System.Drawing.Point(Right - 7, Top)
                 };
                 histForm.Show(this);
+            }
+            if (regForm != null)
+            {
+                regForm.Hide();
+                regForm = null;
+            }
+            else
+            {
+                regForm = new RegistersForm()
+                {
+                    Location = new System.Drawing.Point(Right + 160, Top)
+                };
+                regForm.Show(this);
             }
         }
 
