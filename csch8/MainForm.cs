@@ -3,6 +3,7 @@ using System.Collections;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace csch8
 {
@@ -15,6 +16,7 @@ namespace csch8
             secondaryBrush = new SolidBrush(Color.AntiqueWhite);
             graphics = CreateGraphics();
             this.KeyPreview = true;
+            stopwatch = new Stopwatch();
         }
 
         private Graphics graphics;
@@ -24,6 +26,7 @@ namespace csch8
         private System.Windows.Forms.Timer timer;
         private HistoryForm histForm;
         private RegistersForm regForm;
+        private Stopwatch stopwatch;
 
         delegate void SetUshortCallback(ushort us);
         private void SetPCLabel(ushort pc)
@@ -90,6 +93,8 @@ namespace csch8
             {
                 graphics.FillRectangles(primaryBrush, list.ToArray());
             }
+            fpsLabel.Text = "FPS: " + (1000.0 / stopwatch.ElapsedMilliseconds).ToString("F0");
+            stopwatch.Restart();
         }
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
@@ -99,13 +104,12 @@ namespace csch8
             {
                 try
                 {
-                    //TODO check if an emu already exists, if so kill it
                     emulator = new Emulator(fileDialog.FileName, dynamicRecompilerToolStripMenuItem.Checked);
                     timer = new System.Windows.Forms.Timer();
                     timer.Tick += new EventHandler(OnTimerTick);
-                   // timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
                     timer.Interval = (1000 / (int)fpsSelector.Value);
                     timer.Start();
+                    stopwatch.Start();
                 }
                 catch (Exception ex)
                 {
@@ -253,12 +257,15 @@ namespace csch8
         {
             if (timer != null)
             {
+                timer.Stop();
                 timer.Interval = (1000 / (int)fpsSelector.Value);
+                timer.Start();
             }
         }
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
+            if (emulator == null) return;
             switch(e.KeyCode)
             {
                 case Keys.D1:
@@ -315,6 +322,7 @@ namespace csch8
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
+            if (emulator == null) return;
             switch (e.KeyCode)
             {
                 case Keys.D1:

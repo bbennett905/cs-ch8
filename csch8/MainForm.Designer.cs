@@ -48,6 +48,7 @@
             this.opcode_label = new System.Windows.Forms.Label();
             this.pauseButton = new System.Windows.Forms.Button();
             this.fpsSelector = new System.Windows.Forms.NumericUpDown();
+            this.fpsLabel = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.fpsSelector)).BeginInit();
             this.SuspendLayout();
@@ -107,7 +108,7 @@
             this.interpreterToolStripMenuItem,
             this.dynamicRecompilerToolStripMenuItem});
             this.cPUToolStripMenuItem.Name = "cPUToolStripMenuItem";
-            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.cPUToolStripMenuItem.Size = new System.Drawing.Size(141, 26);
             this.cPUToolStripMenuItem.Text = "&CPU";
             // 
             // interpreterToolStripMenuItem
@@ -134,7 +135,7 @@
             this.toolStripSeparator1,
             this.showFPSToolStripMenuItem});
             this.graphicsToolStripMenuItem.Name = "graphicsToolStripMenuItem";
-            this.graphicsToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.graphicsToolStripMenuItem.Size = new System.Drawing.Size(141, 26);
             this.graphicsToolStripMenuItem.Text = "&Graphics";
             // 
             // setColorsToolStripMenuItem
@@ -143,7 +144,7 @@
             this.primaryToolStripMenuItem,
             this.secondaryToolStripMenuItem});
             this.setColorsToolStripMenuItem.Name = "setColorsToolStripMenuItem";
-            this.setColorsToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.setColorsToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.setColorsToolStripMenuItem.Text = "Set &Colors";
             // 
             // primaryToolStripMenuItem
@@ -163,13 +164,13 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(178, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(148, 6);
             // 
             // showFPSToolStripMenuItem
             // 
             this.showFPSToolStripMenuItem.CheckOnClick = true;
             this.showFPSToolStripMenuItem.Name = "showFPSToolStripMenuItem";
-            this.showFPSToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.showFPSToolStripMenuItem.Size = new System.Drawing.Size(151, 26);
             this.showFPSToolStripMenuItem.Text = "Show &FPS";
             // 
             // debugToolStripMenuItem
@@ -210,7 +211,7 @@
             // pauseButton
             // 
             this.pauseButton.Location = new System.Drawing.Point(567, 0);
-            this.pauseButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pauseButton.Margin = new System.Windows.Forms.Padding(4);
             this.pauseButton.Name = "pauseButton";
             this.pauseButton.Size = new System.Drawing.Size(75, 30);
             this.pauseButton.TabIndex = 3;
@@ -223,9 +224,9 @@
             this.fpsSelector.AllowDrop = true;
             this.fpsSelector.InterceptArrowKeys = false;
             this.fpsSelector.Location = new System.Drawing.Point(501, 2);
-            this.fpsSelector.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.fpsSelector.Margin = new System.Windows.Forms.Padding(4);
             this.fpsSelector.Maximum = new decimal(new int[] {
-            120,
+            540,
             0,
             0,
             0});
@@ -233,17 +234,27 @@
             this.fpsSelector.Size = new System.Drawing.Size(57, 22);
             this.fpsSelector.TabIndex = 4;
             this.fpsSelector.Value = new decimal(new int[] {
-            60,
+            120,
             0,
             0,
             0});
             this.fpsSelector.ValueChanged += new System.EventHandler(this.FPSSelector_Changed);
+            // 
+            // fpsLabel
+            // 
+            this.fpsLabel.AutoSize = true;
+            this.fpsLabel.Location = new System.Drawing.Point(428, 4);
+            this.fpsLabel.Name = "fpsLabel";
+            this.fpsLabel.Size = new System.Drawing.Size(66, 17);
+            this.fpsLabel.TabIndex = 5;
+            this.fpsLabel.Text = "FPS: 000";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(853, 423);
+            this.Controls.Add(this.fpsLabel);
             this.Controls.Add(this.fpsSelector);
             this.Controls.Add(this.pauseButton);
             this.Controls.Add(this.opcode_label);
@@ -252,7 +263,7 @@
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -290,6 +301,7 @@
         private System.Windows.Forms.ToolStripMenuItem debugToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem historyToolStripMenuItem2;
         private System.Windows.Forms.NumericUpDown fpsSelector;
+        private System.Windows.Forms.Label fpsLabel;
     }
 }
 
