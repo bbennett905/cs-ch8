@@ -430,8 +430,8 @@ namespace csch8
                             //Store the BCD representation of VX at I, I+1, I+2 (0xFX33)
                             case 0x0033:
                                 Memory[AddressRegister] = (byte)(Registers[(opcode & 0x0F00) >> 8] / 100);
-                                Memory[AddressRegister] = (byte)((Registers[(opcode & 0x0F00) >> 8] / 10) % 10);
-                                Memory[AddressRegister] = (byte)((Registers[(opcode & 0x0F00) >> 8] % 100) % 10);
+                                Memory[AddressRegister + 1] = (byte)((Registers[(opcode & 0x0F00) >> 8] / 10) % 10);
+                                Memory[AddressRegister + 2] = (byte)((Registers[(opcode & 0x0F00) >> 8] % 100) % 10);
                                 ProgramCounter += 2;
                                 break;
 
