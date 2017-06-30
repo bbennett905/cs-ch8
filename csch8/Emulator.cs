@@ -36,6 +36,8 @@ namespace csch8
         //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
         public byte[] Memory { get; private set; } = new byte[4096];
 
+        public bool[,] Display { get; private set; } = new bool[64, 32];
+
         //16, 8 bit data Registers: V0-VF. VF may be a flag register for some instructions
         public byte[] Registers { get; private set; } = new byte[16];
 
@@ -121,10 +123,12 @@ namespace csch8
                         {
                             //Display clear, set all disp buffer values to 0
                             case 0x00E0:
-                                //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
-                                for (int i = 0xF00; i <= 0xFFF; i++)
+                                for (int i = 0; i < 64; i++)
                                 {
-                                    Memory[i] = 0;
+                                    for (int j = 0; j < 32; j++)
+                                    {
+                                        Display[i, j] = false;
+                                    }
                                 }
                                 ProgramCounter += 2;
                                 break;
@@ -316,49 +320,27 @@ namespace csch8
 
                         Registers[0xF] = 0;
 
-                        byte[] temp = new byte[h];
-                        Array.Copy(Memory, AddressRegister, temp, 0, temp.Length);
-                        BitArray spriteBA = new BitArray(temp);
-
-                        byte[] temp2 = new byte[256];
-                        Array.Copy(Memory, 3840, temp2, 0, 256);
-                        BitArray gfxBA = new BitArray(temp2);
-
-                        for (int pos = 0; pos < spriteBA.Count; pos++)
+                        for (int row = 0; row < h; row++)
                         {
-                            //first check if we're supposed to draw a bit here
-                            if (spriteBA[pos])
+                            for (int col = 0; col < 8; col++)
                             {
-                                int xSpritePos = pos % 8;
-                                int ySpritePos = pos / 8;
-
-                                int xPos = x + xSpritePos;
-                                int yPos = y + ySpritePos;
+                                int xPos = x + col;
+                                int yPos = y + row;
                                 if (xPos >= 64)
                                     continue;
-                                if (yPos >= 32)
-                                    throw new ArgumentException("y was wrong");
 
-                                int i = xPos + (64 * yPos);
-                                if (i > gfxBA.Count)
-                                    throw new ArgumentException("i value is wrong");
-                                if (gfxBA[i])
+                                //first check if we're supposed to draw a bit here
+                                if ((Memory[(AddressRegister + row)] & (0x80 >> col)) != 0)
                                 {
-                                    Registers[0xF] = 1;
+                                    if (Display[xPos, yPos])
+                                    {
+                                        Registers[0xF] = 1;
+                                    }
+                                    Display[xPos, yPos] ^= true;
                                 }
-                                
-                                
-                                
-                                //gfxBA[(x + xPos) + (64 * (y + yPos))] ^= true;
-                                Memory[0xF00 + i / 8] ^= (byte)(1 << (7 - (i % 8)));
-
-                                //Memory[0xF00 + ((x + (pos % 8) + ((y + (pos / 8)) * 64))) / 8] ^= 
-                                //    (byte)(1 << 8 - ((x + (pos % 8) + ((y + (pos / 8)) * 64)) + pos) % 8);
-                                //Memory[0xF00 + ((pos + x + (y * 64)) / 8)] ^= 1;//(byte)(1 << (8 - (pos % 8)));
                             }
                         }
-                        
-                        //gfxBA.CopyTo(Memory, 3840);
+
                         ProgramCounter += 2;
                         break;
 

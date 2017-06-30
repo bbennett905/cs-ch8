@@ -54,8 +54,8 @@ namespace csch8
         /// <summary>
         /// Draws a frame on the screen.
         /// </summary>
-        /// <param name="memory">Takes chip8 memory by reference</param>
-        public void DrawFrame(byte[] memory)
+        /// <param name="disp">Takes chip8 display data</param>
+        public void DrawFrame(bool[,] disp, byte[] memory)
         {
             SetPCLabel(emulator.ProgramCounter);
             SetOpcodeLabel(emulator.CurrentOpcode);
@@ -68,21 +68,20 @@ namespace csch8
                 regForm.Update(emulator.Registers, emulator.ProgramCounter, emulator.AddressRegister, emulator.DelayTimer, emulator.SoundTimer);
             }
             if (emulator.Paused) return;
-            //0xF00-0xFFF (3840 - 4095): Display Refresh (1bit/px, 64x32)
-            byte[] temp = new byte[256];
-            Array.Copy(memory, 3840, temp, 0, 256);
-            BitArray ba = new BitArray(temp);
 
-            List<Rectangle> list = new List<Rectangle>(ba.Length);
+            List<Rectangle> list = new List<Rectangle>(64 * 32);
 
-            for (int i = 0; i < ba.Length; i++)
+            for (int i = 0; i < 64; i++)
             {
-                if (ba[i])
+                for (int j = 0; j < 32; j++)
                 {
-                    list.Add(new Rectangle(10 * (i % 64), 24 + 10 * (i / 64), 10, 10));
+                    if (disp[i, j])
+                    {
+                        list.Add(new Rectangle(10 * i, 24 + 10 * j, 10, 10));
+                    }
                 }
-                //graphics.FillRectangle(primaryBrush, r);
             }
+
             Rectangle bg = new Rectangle(0, 24, 640, 320);
 
             //TODO "manual" double buffering using bitmap may help with screen tearing
@@ -120,7 +119,7 @@ namespace csch8
             try
             {
                 emulator.RunCycle();
-                DrawFrame(emulator.Memory);
+                DrawFrame(emulator.Display, emulator.Memory);
             }
             catch (Exception ex)
             {
