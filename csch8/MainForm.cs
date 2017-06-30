@@ -17,11 +17,13 @@ namespace csch8
             graphics = CreateGraphics();
             this.KeyPreview = true;
             stopwatch = new Stopwatch();
+            buffer = new Bitmap(640, 320);
         }
 
         private Graphics graphics;
         private SolidBrush primaryBrush;
         private SolidBrush secondaryBrush;
+        private Bitmap buffer;
         private Emulator emulator;
         private System.Windows.Forms.Timer timer;
         private HistoryForm histForm;
@@ -54,17 +56,14 @@ namespace csch8
                 opcode_label.Text = "Op: " + op.ToString("X4");
             }
         }
-        /// <summary>
-        /// Draws a frame on the screen.
-        /// </summary>
-        /// <param name="disp">Takes chip8 display data</param>
-        public void DrawFrame(bool[,] disp, byte[] memory)
+
+        public void DrawFrame()
         {
             SetPCLabel(emulator.ProgramCounter);
             SetOpcodeLabel(emulator.CurrentOpcode);
             if (histForm != null)
             {
-                histForm.Update(emulator.History, memory);
+                histForm.Update(emulator.History, emulator.Memory);
             }
             if (regForm != null)
             {
@@ -72,29 +71,41 @@ namespace csch8
             }
             if (emulator.Paused) return;
 
-            List<Rectangle> list = new List<Rectangle>(64 * 32);
-
-            for (int i = 0; i < 64; i++)
-            {
-                for (int j = 0; j < 32; j++)
-                {
-                    if (disp[i, j])
-                    {
-                        list.Add(new Rectangle(10 * i, 24 + 10 * j, 10, 10));
-                    }
-                }
-            }
-
-            Rectangle bg = new Rectangle(0, 24, 640, 320);
-
-            //TODO "manual" double buffering using bitmap may help with screen tearing
-            graphics.FillRectangle(secondaryBrush, bg);
-            if (list.Count > 0)
-            {
-                graphics.FillRectangles(primaryBrush, list.ToArray());
-            }
+            Invalidate();
             fpsLabel.Text = "FPS: " + (1000.0 / stopwatch.ElapsedMilliseconds).ToString("F0");
             stopwatch.Restart();
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            if (emulator != null)
+            {
+                List<Rectangle> list = new List<Rectangle>(64 * 32);
+
+                for (int i = 0; i < 64; i++)
+                {
+                    for (int j = 0; j < 32; j++)
+                    {
+                        if (emulator.Display[i, j])
+                        {
+                            list.Add(new Rectangle(10 * i, 10 * j, 10, 10));
+                        }
+                    }
+                }
+
+                Rectangle bg = new Rectangle(0, 0, 640, 320);
+
+                using (var gfx = Graphics.FromImage(buffer))//CreateGraphics())//
+                {
+                    gfx.FillRectangle(secondaryBrush, bg);
+                    if (list.Count > 0)
+                    {
+                        gfx.FillRectangles(primaryBrush, list.ToArray());
+                    }
+                }
+                e.Graphics.DrawImage(buffer, 0, 24);
+            }
+            base.OnPaint(e);
         }
 
         private void LoadToolStripMenuItem_Click(object sender, EventArgs e)
