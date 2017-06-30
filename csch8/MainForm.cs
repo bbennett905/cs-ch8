@@ -115,7 +115,7 @@ namespace csch8
             try
             {
                 emulator.RunCycle();
-                DrawFrame(emulator.memory);
+                DrawFrame(emulator.Memory);
             }
             catch (Exception ex)
             {
