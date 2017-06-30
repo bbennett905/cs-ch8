@@ -201,23 +201,6 @@ namespace csch8
             }
         }
 
-        private void ViewHistoryButton_Click(object sender, EventArgs e)
-        {
-            if (histForm != null)
-            {
-                histForm.Hide();
-                histForm = null;
-            }
-            else
-            {
-                histForm = new HistoryForm()
-                {
-                    Location = new System.Drawing.Point(Right, Top - 20)
-                };
-                histForm.Show(this);
-            }
-        }
-
         protected override void OnMove(EventArgs e)
         {
             base.OnMove(e);
