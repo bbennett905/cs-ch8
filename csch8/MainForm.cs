@@ -16,7 +16,7 @@ namespace csch8
             secondaryBrush = new SolidBrush(Color.AntiqueWhite);
             graphics = CreateGraphics();
             this.KeyPreview = true;
-            stopwatch = new Stopwatch();
+            timeSinceDraw = new Stopwatch();
             buffer = new Bitmap(640, 320);
         }
 
@@ -28,7 +28,8 @@ namespace csch8
         private System.Windows.Forms.Timer timer;
         private HistoryForm histForm;
         private RegistersForm regForm;
-        private Stopwatch stopwatch;
+        private Stopwatch timeSinceDraw;
+        private int cyclesSinceDraw;
 
         delegate void SetUshortCallback(ushort us);
         private void SetPCLabel(ushort pc)
@@ -59,8 +60,8 @@ namespace csch8
 
         public void DrawFrame()
         {
-            SetPCLabel(emulator.ProgramCounter);
-            SetOpcodeLabel(emulator.CurrentOpcode);
+            //SetPCLabel(emulator.ProgramCounter);
+            //SetOpcodeLabel(emulator.CurrentOpcode);
             if (histForm != null)
             {
                 histForm.Update(emulator.History, emulator.Memory);
@@ -69,11 +70,17 @@ namespace csch8
             {
                 regForm.Update(emulator.Registers, emulator.ProgramCounter, emulator.AddressRegister, emulator.DelayTimer, emulator.SoundTimer);
             }
+            
             if (emulator.Paused) return;
+            cyclesSinceDraw++;
 
-            Invalidate();
-            fpsLabel.Text = "FPS: " + (1000.0 / stopwatch.ElapsedMilliseconds).ToString("F0");
-            stopwatch.Restart();
+            if (timeSinceDraw.ElapsedMilliseconds >= (1000.0 / 30.0))
+            {
+                Invalidate();
+                fpsLabel.Text = "ms: " + (timeSinceDraw.ElapsedMilliseconds / cyclesSinceDraw).ToString("F0");
+                timeSinceDraw.Restart();
+                cyclesSinceDraw = 0;
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -120,7 +127,7 @@ namespace csch8
                     timer.Tick += new EventHandler(OnTimerTick);
                     timer.Interval = (1000 / (int)fpsSelector.Value);
                     timer.Start();
-                    stopwatch.Start();
+                    timeSinceDraw.Start();
                 }
                 catch (Exception ex)
                 {
@@ -134,7 +141,7 @@ namespace csch8
             try
             {
                 emulator.RunCycle();
-                DrawFrame(emulator.Display, emulator.Memory);
+                DrawFrame();
             }
             catch (Exception ex)
             {
